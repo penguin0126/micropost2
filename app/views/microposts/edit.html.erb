@@ -1,0 +1,7 @@
+<% provide(:button_text, 'Edit this micropost') %>
+<aside class="col-md-4">
+  <%= render 'microposts/form_microposts', micropost: @micropost %>
+</aside>
+<div class="col-xs-8">
+  <%= render 'microposts/microposts', microposts: @microposts %>
+</div>

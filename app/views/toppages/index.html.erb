@@ -1,5 +1,13 @@
+<% provide(:button_text, 'Create micropost') %>
 <% if logged_in? %>
-  <p>login_user : <%= current_user.name %></p>
+  <div class="row">
+    <aside class="col-md-4">
+      <%= render 'microposts/form_microposts', micropost: @micropost %>
+    </aside>
+    <div class="col-xs-8">
+      <%= render 'microposts/microposts', microposts: @microposts %>
+    </div>
+  </div>
 <% else %>
   <div class="center jumbotron">
     <div class="text-center">

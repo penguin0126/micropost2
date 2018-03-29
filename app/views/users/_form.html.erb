@@ -3,7 +3,7 @@
     <%= form_for(user) do |f| %>
 
       <%= render 'layouts/error_messages', model: f.object %>
-      
+
       <div class="form-group">
         <%= f.label :name, 'Name' %>
         <%= f.text_field :name, class: 'form-control' %>
@@ -24,7 +24,7 @@
         <%= f.password_field :password_confirmation, class: 'form-control' %>
       </div>
 
-      <%= f.submit 'Sign up', class: 'btn btn-primary btn-block' %>
+      <%= f.submit yield(:button_text), class: 'btn btn-primary btn-block' %>
     <% end %>
   </div>
 </div>

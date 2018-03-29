@@ -8,4 +8,8 @@ class ApplicationController < ActionController::Base
       redirect_to login_url
     end
   end
+
+  def counts(user)
+    @micropost_count = user.microposts.count
+  end
 end

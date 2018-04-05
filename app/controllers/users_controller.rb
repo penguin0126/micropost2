@@ -1,13 +1,12 @@
 class UsersController < ApplicationController
-  before_action :require_login, only: [:index, :show, :edit, :update, :destroy]
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :require_login, only: [:index, :show, :edit, :update, :destroy, :followings, :followers]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :followings, :followers]
   before_action :correct_user, only: [:edit, :update, :destroy]
   def index
     @users = User.all.page(params[:page])
   end
 
   def show
-    @user = User.find(params[:id])
     @microposts = @user.microposts.order('created_at DESC').page(params[:page])
     counts(@user)
   end
@@ -20,7 +19,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      session[:user_id] = @user.id #login(@user)
+      session[:user_id] = @user.id
       flash[:success] = "Successfully created..."
       redirect_to @user
     else
@@ -48,18 +47,28 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
+  def followings
+    @followings = @user.followings.page(params[:page])
+    counts(@user)
+  end
+
+  def followers
+    @followers = @user.followers.page(params[:page])
+    counts(@user)
+  end
+
   private
 
-  def user_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation)
-  end
+   def user_params
+     params.require(:user).permit(:name, :email, :password, :password_confirmation)
+   end
 
-  def set_user
-    @user = User.find(params[:id])
-  end
+   def set_user
+     @user = User.find(params[:id])
+   end
 
-  def correct_user
-    @user = User.find(params[:id])
-    redirect_to root_url unless @user == current_user
-  end
+   def correct_user
+     @user = User.find(params[:id])
+     redirect_to root_url unless @user == current_user
+   end
 end

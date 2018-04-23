@@ -6,7 +6,7 @@
       </div>
       <div class="media-body">
         <div>
-          <%= link_to micropost.user.name, micropost.user %> <span class="text-muted">posted at <%= micropost.created_at %></span>
+          <%= link_to micropost.user.name, micropost.user %> <span class="text-muted"><%= time_ago_in_words(micropost.created_at) %> ago.</span>
         </div>
         <div>
           <% if current_user == micropost.user %>
@@ -14,12 +14,14 @@
           <% else %>
             <p><%= micropost.id %>:<%= micropost.content %></p>
           <% end %>
+          <%= image_tag micropost.picture.url if micropost.picture? %>
         </div>
         <div>
           <% if current_user == micropost.user %>
             <%= link_to 'Delete', micropost, method: :delete, data: { confirm: 'You sure?' }, class: 'btn btn-danger btn-xs'%>
           <% end %>
         </div>
+          <%= render 'favorites/like_button', micropost: micropost %>
       </div>
     </li>
   <% end %>

@@ -36,6 +36,14 @@
           </span>
         <% end %>
       </li>
+      <li class="<%= 'active' if current_page?(favorite_posts_user_path(@user)) %>">
+        <%= link_to favorite_posts_user_path(@user) do %>
+          Favorite
+          <span class="badge">
+            <%= @favorite_posts_count %>
+          </span>
+        <% end %>
+      </li>
     </ul>
     <%= render 'users', users: @followings %>
   </div>

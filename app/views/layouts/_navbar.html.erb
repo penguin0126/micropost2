@@ -26,7 +26,7 @@
                 <li role="separator" class="divider"></li>
                 <li><%= link_to 'Logout', logout_path, method: :delete %></li>
                 <li role="separator" class="divider"></li>
-                <li><%= link_to 'Signout', current_user, method: :delete, data: { confirm: "You sure?" }%></li>
+                <li><%= link_to 'Quit', current_user, method: :delete, data: { confirm: "You sure?" }%></li>
               </ul>
             </li>
           <% else %>

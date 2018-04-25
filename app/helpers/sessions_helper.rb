@@ -3,7 +3,22 @@ module SessionsHelper
     session[:user_id] = user.id
   end
 
-  def logout
+ # ユーザーのセッションを永続的にする
+  def remember(user)
+    user.remember
+    cookies.permanent.signed[:user_id] = user.id
+    cookies.permanent[:remember_token] = user.remember_token #attr_accessor読み出しメソッド
+  end
+
+ # 永続的セッションを破棄する
+  def forget(user)
+    user.forget
+    cookies.delete(:user_id)
+    cookies.delete(:remember_token)
+  end
+
+  def log_out
+    forget(current_user)
     session.delete(:user_id)
     @current_user = nil
   end
@@ -22,17 +37,5 @@ module SessionsHelper
 
   def logged_in?
     !!current_user
-  end
-
-  def remember(user)
-    user.remember
-    cookies.permanent.signed[:user_id] = user.id
-    cookies.permanent[:remember_token] = user.remember_token
-  end
-
-  def forget(user)
-    user.forget
-    cookies.delete(:user_id)
-    cookies.delete(:remember_token)
   end
 end

@@ -3,8 +3,7 @@ class UsersController < ApplicationController
   before_action :set_user, except: [:index, :new, :create]
   before_action :correct_user, only: [:edit, :update, :destroy]
   def index
-    @users = User.all.page(params[:page])
-    #@users = User.where(activated: true).page(params[:page])
+    @users = User.where(activated: true).page(params[:page])
   end
 
   def show
@@ -23,7 +22,6 @@ class UsersController < ApplicationController
       flash[:info] = "Please check your email to activate your account."
       redirect_to @user
     else
-      flash.now[:danger] = '失敗'
       render :new
     end
   end

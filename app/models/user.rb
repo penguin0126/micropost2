@@ -1,5 +1,5 @@
 class User < ApplicationRecord
-attr_accessor :remember_token, :activation_token
+attr_accessor :remember_token, :activation_token, :reset_token
   before_save :downcase_email
   validates :name, presence: true, length: { maximum: 50 }
   validates :email, presence: true, length: { maximum: 50 },
@@ -52,7 +52,7 @@ attr_accessor :remember_token, :activation_token
     Micropost.where(user_id: self.following_ids + [self.id])
   end
 
-  #remember me function
+  # remember me / acctivate / reset password 共通
   def User.digest(string)
     cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
                                                   BCrypt::Engine.cost
@@ -63,22 +63,22 @@ attr_accessor :remember_token, :activation_token
     SecureRandom.urlsafe_base64
   end
 
-  def remember
-    @remember_token = User.new_token # ただのインスタンス変数代入
-    update_attribute(:remember_digest, User.digest(@remember_token))
-  end
-  #self.remember_token = User.new_token  メソッド使用の方がいいのか?
-  #User.digest(remember_token) (self.remember_token)???
-
-  def forget
-    update_attribute(:remember_digest, nil)
-  end
-
-  #共通認証メソッド
   def authenticated?(attribute, token)
     digest = send("#{attribute}_digest")
     return false if digest.nil?
     BCrypt::Password.new(digest).is_password?(token)
+  end
+
+  #remember me function
+  def remember
+    @remember_token = User.new_token
+    update_attribute(:remember_digest, User.digest(@remember_token))
+  end
+    #self.remember_token = User.new_token
+    #User.digest(remember_token) (self.remember_token)
+
+  def forget
+    update_attribute(:remember_digest, nil)
   end
 
   #activate account function
@@ -91,6 +91,21 @@ attr_accessor :remember_token, :activation_token
     UserMailer.account_activation(self).deliver_now
   end
 
+  #reset password function
+  def create_password_digest
+    @reset_token = User.new_token
+    update_attribute(:reset_digest, User.digest(@reset_token))
+    update_attribute(:reset_sent_at, Time.zone.now)
+  end
+
+  def send_password_reset_email
+    UserMailer.password_reset(self).deliver_now
+  end
+
+  def password_expired?
+    reset_sent_at < 2.hours.ago
+  end
+
   private
 
    def downcase_email
@@ -98,7 +113,7 @@ attr_accessor :remember_token, :activation_token
    end
 
    def create_activation_digest
-     self.activation_token = User.new_token #self
-     self.activation_digest = User.digest(activation_token) #self
+     self.activation_token = User.new_token
+     self.activation_digest = User.digest(activation_token)
    end
 end

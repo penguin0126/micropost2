@@ -1,15 +1,13 @@
 class User < ApplicationRecord
-attr_accessor :remember_token, :acctivation_token
-  before_save { self.email.downcase! }
+attr_accessor :remember_token, :activation_token
+  before_save :downcase_email
   validates :name, presence: true, length: { maximum: 50 }
   validates :email, presence: true, length: { maximum: 50 },
                     format: { with: /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i },
                     uniqueness: { case_sensitive: false }
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }
-
-
-  #before_create :create_activation_digest
+  before_create :create_activation_digest
   has_many :microposts, dependent: :destroy
   has_many :relationships, dependent: :destroy
   has_many :followings, through: :relationships, source: :follow
@@ -18,32 +16,6 @@ attr_accessor :remember_token, :acctivation_token
   has_many :favorites, dependent: :destroy
   has_many :favorite_microposts, through: :favorites, source: :micropost
 
-
-  #remember me function
-  def User.digest(string)
-    cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
-                                                  BCrypt::Engine.cost
-    BCrypt::Password.create(string, cost: cost)
-  end
-
-  def User.new_token
-    SecureRandom.urlsafe_base64
-  end
-
-  def remember
-    @remember_token = User.new_token # ただのインスタンス変数代入
-    update_attribute(:remember_digest, User.digest(@remember_token))
-  end
-  #self.remember_token = User.new_token  メソッド使用の方がいいのか?
-  #User.digest(remember_token) (self.remember_token)???
-
-  def authenticated?(remember_token)
-     BCrypt::Password.new(remember_digest).is_password?(remember_token)
-  end
-
-  def forget
-    update_attribute(:remember_digest, nil)
-  end
 
   #follow function
   def follow(other_user)
@@ -80,13 +52,36 @@ attr_accessor :remember_token, :acctivation_token
     Micropost.where(user_id: self.following_ids + [self.id])
   end
 
-=begin
+  #remember me function
+  def User.digest(string)
+    cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                                  BCrypt::Engine.cost
+    BCrypt::Password.create(string, cost: cost)
+  end
+
+  def User.new_token
+    SecureRandom.urlsafe_base64
+  end
+
+  def remember
+    @remember_token = User.new_token # ただのインスタンス変数代入
+    update_attribute(:remember_digest, User.digest(@remember_token))
+  end
+  #self.remember_token = User.new_token  メソッド使用の方がいいのか?
+  #User.digest(remember_token) (self.remember_token)???
+
+  def forget
+    update_attribute(:remember_digest, nil)
+  end
+
+  #共通認証メソッド
   def authenticated?(attribute, token)
     digest = send("#{attribute}_digest")
     return false if digest.nil?
     BCrypt::Password.new(digest).is_password?(token)
   end
 
+  #activate account function
   def activate
     update_attribute(:activated, true)
     update_attribute(:activated_at, Time.zone.now)
@@ -98,9 +93,12 @@ attr_accessor :remember_token, :acctivation_token
 
   private
 
-   def create_activation_digest
-     self.acctivation_token = User.new_token
-     self.acctivation_digest = User.digest(acctivation_token)
+   def downcase_email
+     @email = email.downcase #self
    end
-=end
+
+   def create_activation_digest
+     self.activation_token = User.new_token #self
+     self.activation_digest = User.digest(activation_token) #self
+   end
 end

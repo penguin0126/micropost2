@@ -3,8 +3,7 @@ class UsersController < ApplicationController
   before_action :set_user, except: [:index, :new, :create]
   before_action :correct_user, only: [:edit, :update, :destroy]
   def index
-    @users = User.all.page(params[:page])
-    #@users = User.where(activated: true).page(params[:page])
+    @users = User.where(activated: true).page(params[:page])
   end
 
   def show
@@ -19,28 +18,14 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
-      log_in @user
-      flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
-    else
-      render 'new'
-    end
-  end
-=begin
-  def create
-    @user = User.new(user_params)
-    if @user.save
       @user.send_activation_email
       flash[:info] = "Please check your email to activate your account."
-      session[:user_id] = @user.id
-      flash[:success] = "Successfully created..."
       redirect_to @user
     else
-      flash.now[:danger] = '失敗'
       render :new
     end
   end
-=end
+
   def edit
   end
 

@@ -32,7 +32,7 @@ module SessionsHelper
   end
 
   def log_in_by_cookies
-    user = User.find_by(id: user_id)
+    user = User.find_by(id: cookies.signed[:user_id])
     if user && user.authenticated?(cookies[:remember_token])
       log_in user
       @current_user

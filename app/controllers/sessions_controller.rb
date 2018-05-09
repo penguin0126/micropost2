@@ -6,7 +6,7 @@ class SessionsController < ApplicationController
   email = params[:session][:email].downcase
   password = params[:session][:password]
   @user = User.find_by(email: email)
-  if @user.activated?
+  if @user.try(:activated?)
     if login(email, password)
       params[:session][:remember_me] == '1' ? remember(@user) : forget(@user)
       flash[:success] = "Successfully logged in..."

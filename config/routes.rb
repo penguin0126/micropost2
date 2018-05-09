@@ -17,6 +17,6 @@ Rails.application.routes.draw do
 
   resources :relationships, only: [:create, :destroy]
   resources :favorites, only: [:create, :destroy]
-  resources :account_activations, only: [:edit]
-  resources :password_resets, only: [:new, :create, :edit, :update]
+  resources :account_activations, only: [:edit], param: :token
+  resources :password_resets, only: [:new, :create, :edit, :update], param: :token
 end
